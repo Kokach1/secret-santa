@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
                 setError(data.message || 'Login failed');
             }
         } catch (err) {
-            setError('Connection failed');
+            setError('Connection failed: ' + err.message);
         } finally {
             setLoading(false);
         }

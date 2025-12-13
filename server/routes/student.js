@@ -43,7 +43,8 @@ router.post('/update-progress', auth(['student']), async (req, res) => {
         const update = {};
         update[`progress.${stage}`] = status;
 
-        const user = await User.findByIdAndUpdate(req.user.userId, update, { new: true });
+        const user = await User.findByIdAndUpdate(req.user.userId, update, { new: true })
+            .populate('paired_to', 'name department semester mobile'); // Persist Child Data
         res.json(user);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });

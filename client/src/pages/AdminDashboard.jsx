@@ -16,12 +16,15 @@ export default function AdminDashboard() {
         // We will stick to client-side filtering or use the separate /admin/pairs if needed, 
         // but for simplicity in this view, let's update GET /students in backend to Populate too.
         const data = await res.json();
-        if (res.ok) {
+        if (res.ok && data.students) {
             setStudents(data.students);
             setStats({
                 total: data.students.length,
                 approved: data.students.filter(s => s.approved).length
             });
+        } else {
+            console.error("Failed to fetch students or invalid format", data);
+            // Don't set students to null/undefined if it fails, keep previous state or empty
         }
         setLoading(false);
     };
@@ -104,7 +107,7 @@ export default function AdminDashboard() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {students.map(student => (
+                                {Array.isArray(students) && students.map(student => (
                                     <tr key={student._id} className="hover:bg-gray-50">
                                         <td className="p-4 font-medium">{student.name || 'No Name'}</td>
                                         <td className="p-4 text-gray-500">{student.email}</td>

@@ -67,10 +67,16 @@ router.delete('/student/:id', auth(['admin']), async (req, res) => {
 router.post('/pair-students', auth(['admin']), async (req, res) => {
     try {
         // 1. Fetch all approved students
-        const students = await User.find({ role: 'student', approved: true });
+        // 1. Fetch all approved students who are verified and have completed details
+        const students = await User.find({
+            role: 'student',
+            approved: true,
+            isVerified: true,
+            detailsCompleted: true
+        });
 
         if (students.length < 2) {
-            return res.status(400).json({ message: 'Not enough approved students to pair' });
+            return res.status(400).json({ message: 'Not enough eligible students (Verified & Profile Completed) to pair' });
         }
 
         // 2. Shuffle Mechanism (Fisher-Yates)

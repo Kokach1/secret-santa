@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 
@@ -7,9 +7,13 @@ export default function VerifyEmailPage() {
     const navigate = useNavigate();
     const [status, setStatus] = useState('verifying');
     const [message, setMessage] = useState('');
+    const ranOnce = useRef(false);
 
     useEffect(() => {
         const verify = async () => {
+            if (ranOnce.current) return;
+            ranOnce.current = true;
+
             const token = searchParams.get('token');
             const email = searchParams.get('email');
 
@@ -20,7 +24,7 @@ export default function VerifyEmailPage() {
             }
 
             try {
-                const res = await fetch(`http://localhost:5000/auth/verify-email?token=${token}&email=${email}`);
+                const res = await fetch(`http://localhost:5000/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`);
                 const data = await res.json();
 
                 if (res.ok) {

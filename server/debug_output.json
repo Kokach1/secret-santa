@@ -1,0 +1,23 @@
+[
+  {
+    "isVerified": false,
+    "detailsCompleted": false,
+    "_id": "693c4da3d0b4cf883973b417",
+    "email": "jeswinjoy615+t1@gmail.com",
+    "approved": true
+  },
+  {
+    "_id": "693c788ae74ccc7399bceb36",
+    "email": "jeswinjoy615+t2@gmail.com",
+    "approved": true,
+    "isVerified": false,
+    "detailsCompleted": true
+  },
+  {
+    "_id": "693c7a42e74ccc7399bceb68",
+    "email": "jeswinjoy615+t4@gmail.com",
+    "approved": true,
+    "isVerified": true,
+    "detailsCompleted": true
+  }
+]

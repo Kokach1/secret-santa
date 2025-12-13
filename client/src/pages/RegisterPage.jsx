@@ -5,12 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 export default function RegisterPage() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        name: '',
         email: '',
-        password: '',
-        department: '',
-        semester: '',
-        mobile: ''
+        password: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -33,7 +29,6 @@ export default function RegisterPage() {
             const data = await res.json();
 
             if (res.ok) {
-                // Instead of navigating, we show success message in place
                 setError('link sent');
             } else {
                 setError(data.message || 'Registration failed');
@@ -57,52 +52,61 @@ export default function RegisterPage() {
                 <h1 className="text-3xl font-christmas font-bold text-center text-christmas-red mb-2">
                     Join Secret Santa
                 </h1>
+                <p className="text-center text-gray-500 mb-6">
+                    Step 1: Create your account
+                </p>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <input name="name" placeholder="Full Name" required className="auth-input" onChange={handleChange} />
+                {error === 'link sent' ? (
+                    <div className="text-center space-y-4 animate-fade-in">
+                        <div className="bg-green-100 p-4 rounded-full inline-block">
+                            <Send className="w-8 h-8 text-green-600" />
+                        </div>
+                        <h2 className="text-xl font-bold text-green-800">Verification Link Sent!</h2>
+                        <p className="text-gray-600">
+                            We've sent a confirmation link to <span className="font-bold text-gray-800">{formData.email}</span>.
+                        </p>
+                        <div className="text-sm bg-yellow-50 p-3 rounded border border-yellow-200 text-yellow-800">
+                            Please check your inbox (and spam folder) to verify your email and complete your profile.
+                        </div>
                     </div>
-                    <div>
-                        <input name="email" type="email" placeholder="College Email" required className="auth-input" onChange={handleChange} />
-                    </div>
-                    <div>
-                        <input name="password" type="password" placeholder="Password" required className="auth-input" onChange={handleChange} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <select name="department" required className="auth-input bg-white" onChange={handleChange} defaultValue="">
-                            <option value="" disabled>Select Dept</option>
-                            <option value="CSE">CSE</option>
-                            <option value="ECE">ECE</option>
-                            <option value="EEE">EEE</option>
-                            <option value="CE">CE</option>
-                            <option value="ME">ME</option>
-                        </select>
-                        <select name="semester" required className="auth-input bg-white" onChange={handleChange} defaultValue="">
-                            <option value="" disabled>Select Sem</option>
-                            <option value="S1">S1</option>
-                            <option value="S2">S2</option>
-                            <option value="S3">S3</option>
-                            <option value="S4">S4</option>
-                            <option value="S5">S5</option>
-                            <option value="S6">S6</option>
-                            <option value="S7">S7</option>
-                            <option value="S8">S8</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input name="mobile" placeholder="Mobile Number" required className="auth-input" onChange={handleChange} />
-                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">College Email</label>
+                            <input
+                                name="email"
+                                type="email"
+                                placeholder="you@cek.ac.in"
+                                required
+                                className="auth-input"
+                                onChange={handleChange}
+                                value={formData.email}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Create Password</label>
+                            <input
+                                name="password"
+                                type="password"
+                                placeholder="••••••••"
+                                required
+                                className="auth-input"
+                                onChange={handleChange}
+                                value={formData.password}
+                            />
+                        </div>
 
-                    {error && <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded">{error}</div>}
+                        {error && <div className="text-red-600 text-sm text-center bg-red-50 p-2 rounded">{error}</div>}
 
-                    <button type="submit" disabled={loading} className="w-full bg-christmas-green hover:bg-green-800 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2">
-                        {loading ? 'Creating Account...' : <>Register <ArrowRight className="w-5 h-5" /></>}
-                    </button>
+                        <button type="submit" disabled={loading} className="w-full bg-christmas-green hover:bg-green-800 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2">
+                            {loading ? 'Sending...' : <>Next: Verify Email <ArrowRight className="w-5 h-5" /></>}
+                        </button>
 
-                    <div className="text-center text-sm text-gray-600 mt-4">
-                        Already have an account? <Link to="/login" className="text-christmas-red font-bold hover:underline">Log In</Link>
-                    </div>
-                </form>
+                        <div className="text-center text-sm text-gray-600 mt-4">
+                            Already have an account? <Link to="/login" className="text-christmas-red font-bold hover:underline">Log In</Link>
+                        </div>
+                    </form>
+                )}
             </div>
         </div>
     );

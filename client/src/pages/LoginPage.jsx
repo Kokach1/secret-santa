@@ -9,33 +9,6 @@ export default function LoginPage() {
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
-    const handleMagicLink = async () => {
-        if (!email) {
-            setStatus('error');
-            setMessage('Please enter your email first to send a magic link.');
-            return;
-        }
-        setStatus('loading');
-        try {
-            const res = await fetch('http://localhost:5000/auth/request-magic-link', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setStatus('magic_sent');
-                setMessage('Magic Link Sent! Check your inbox.');
-            } else {
-                setStatus('error');
-                setMessage(data.message);
-            }
-        } catch (err) {
-            setStatus('error');
-            setMessage('Failed to send magic link');
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus('loading');
@@ -55,8 +28,13 @@ export default function LoginPage() {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                if (data.user.role === 'admin') navigate('/admin/dashboard');
-                else navigate('/student/dashboard');
+                if (data.user.role === 'admin') {
+                    navigate('/admin/dashboard');
+                } else if (!data.user.detailsCompleted) {
+                    navigate('/complete-profile');
+                } else {
+                    navigate('/student/dashboard');
+                }
             } else {
                 setStatus('error');
                 setMessage(data.message || 'Login failed');
@@ -122,16 +100,6 @@ export default function LoginPage() {
                         </button>
 
                         <div className="text-center text-sm space-y-2">
-                            <div>
-                                <span className="text-gray-600">Forgot Password? </span>
-                                <button
-                                    type="button"
-                                    onClick={handleMagicLink}
-                                    className="text-christmas-green font-bold hover:underline"
-                                >
-                                    Use Magic Link
-                                </button>
-                            </div>
                             <div>
                                 <span className="text-gray-600">New here? </span>
                                 <a href="/register" className="text-christmas-red font-bold hover:underline">Create Account</a>

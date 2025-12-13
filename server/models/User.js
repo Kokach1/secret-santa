@@ -50,7 +50,15 @@ const UserSchema = new mongoose.Schema({
         gift_ready: { type: Boolean, default: false },
         gift_delivered: { type: Boolean, default: false },
         gift_received: { type: Boolean, default: false }
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    detailsCompleted: {
+        type: Boolean,
+        default: false
     }
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model('User', UserSchema);
