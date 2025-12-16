@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Gift, Clock, CheckCircle } from 'lucide-react';
+import { Gift, Clock, CheckCircle, Bell } from 'lucide-react';
 import ChristmasHeader from '../components/ChristmasHeader';
 import SnowAnimation from '../components/SnowAnimation';
 
@@ -7,26 +7,58 @@ export default function StudentDashboard() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [reveal, setReveal] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [timeLeft, setTimeLeft] = useState('');
+
+    const fetchNotifications = async () => {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:5000/student/notifications', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+            setNotifications(await res.json());
+        }
+    };
+
+    const fetchMe = async (isBackground = false) => {
+        try {
+            if (!isBackground) setLoading(true);
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:5000/student/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                // Combine user and santa_progress
+                setUser(prev => ({ ...data.user, santa_progress: data.santa_progress, settings: data.settings }));
+                // Calculate Countdown
+                if (data.settings?.event_date) {
+                    const diff = new Date(data.settings.event_date) - new Date();
+                    if (diff > 0) {
+                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                        const minutes = Math.floor((diff / 1000 / 60) % 60);
+                        setTimeLeft(`${days}d ${hours}h ${minutes}m`);
+                    } else {
+                        setTimeLeft('The Event has Started! 🎄');
+                    }
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            if (!isBackground) setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchMe = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await fetch('http://localhost:5000/student/me', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    // Combine user and santa_progress
-                    setUser({ ...data.user, santa_progress: data.santa_progress });
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchMe();
+        fetchNotifications();
+        const interval = setInterval(() => {
+            fetchMe(true);
+            fetchNotifications();
+        }, 10000); // Poll every 10s
+        return () => clearInterval(interval);
     }, []);
 
     const updateProgress = async (stage) => {
@@ -41,7 +73,7 @@ export default function StudentDashboard() {
                 body: JSON.stringify({ stage, status: !user.progress[stage] })
             });
             const updatedUser = await res.json();
-            setUser(updatedUser);
+            setUser(prev => ({ ...updatedUser, santa_progress: prev.santa_progress, settings: prev.settings }));
         } catch (err) {
             console.error(err);
         }
@@ -49,12 +81,53 @@ export default function StudentDashboard() {
 
     if (loading) return <div className="p-10 text-center">Loading your presents... 🎁</div>;
 
+    const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'TBA';
+
     return (
         <div className="min-h-screen bg-christmas-white pb-20">
             <SnowAnimation />
             <ChristmasHeader user={user} />
 
             <main className="max-w-4xl mx-auto p-6 space-y-8">
+
+                {/* Countdown Timer */}
+                {user.settings?.event_date && (
+                    <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-6 rounded-2xl shadow-lg text-center transform hover:scale-[1.02] transition">
+                        <h2 className="text-xl font-christmas opacity-90 mb-1">Time until Exchange Event</h2>
+                        <div className="text-4xl md:text-5xl font-bold tracking-wider">{timeLeft}</div>
+                        <p className="text-sm mt-2 opacity-80">{formatDate(user.settings.event_date)}</p>
+                    </div>
+                )}
+
+                {/* Notifications */}
+                {notifications.length > 0 && (
+                    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm space-y-3">
+                        <h3 className="font-bold text-blue-800 flex items-center gap-2"><Bell className="w-4 h-4" /> Announcements</h3>
+                        {notifications.map(n => (
+                            <div key={n._id} className="bg-white p-3 rounded border border-blue-100 shadow-sm">
+                                <p className="font-bold text-gray-800">{n.title}</p>
+                                <p className="text-gray-600 text-sm">{n.message}</p>
+                                <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleString()}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Timeline */}
+                <div className="flex justify-between items-center text-xs md:text-sm text-gray-500 bg-white p-4 rounded-xl shadow-sm overflow-x-auto">
+                    {[
+                        { label: 'Register', date: user.settings?.registration_deadline, done: true },
+                        { label: 'Pairing', date: user.settings?.pairing_date, done: user.settings?.pairing_done },
+                        { label: 'Gift Ready', date: user.settings?.gift_ready_deadline, done: user.santa_progress?.gift_ready },
+                        { label: 'The Event', date: user.settings?.event_date, done: false }
+                    ].map((step, i) => (
+                        <div key={i} className={`flex flex-col items-center min-w-[80px] ${step.done ? 'text-green-600' : ''}`}>
+                            <div className={`w-3 h-3 rounded-full mb-2 ${step.done ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                            <span className="font-bold">{step.label}</span>
+                            <span className="text-[10px]">{formatDate(step.date)}</span>
+                        </div>
+                    ))}
+                </div>
 
                 {/* Verification Status */}
                 {!user.approved && (
@@ -101,7 +174,6 @@ export default function StudentDashboard() {
                 )}
 
                 {/* Progress Tracker */}
-                {/* Progress Tracker (My Gift to Child) */}
                 {user.paired_to && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* My Progress */}
@@ -117,9 +189,7 @@ export default function StudentDashboard() {
                                     };
                                     const isActive = user.progress[stage];
 
-                                    // Sequential Check: 
-                                    // Ready: Always enabled.
-                                    // Delivered: Requires Ready.
+                                    // Sequential Check
                                     const isDisabled = stage === 'gift_delivered' && !user.progress['gift_ready'];
 
                                     return (
@@ -142,7 +212,7 @@ export default function StudentDashboard() {
                             </div>
                         </div>
 
-                        {/* Santa's Progress (Gift coming to me) */}
+                        {/* Santa's Progress */}
                         <div className="bg-white p-6 rounded-2xl shadow-md border-t-4 border-christmas-gold">
                             <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                                 <Gift className="text-christmas-gold" /> Incoming Gift Status

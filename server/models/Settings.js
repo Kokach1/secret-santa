@@ -10,6 +10,18 @@ const SettingsSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    pairing_date: {
+        type: Date,
+        default: null
+    },
+    gift_ready_deadline: {
+        type: Date,
+        default: null
+    },
+    event_date: {
+        type: Date,
+        default: null
+    },
     pairing_done: {
         type: Boolean,
         default: false

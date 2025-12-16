@@ -30,16 +30,22 @@ router.post('/approve-student', auth(['admin']), async (req, res) => {
     }
 });
 
-// POST /admin/set-deadline
-router.post('/set-deadline', auth(['admin']), async (req, res) => {
+// POST /admin/update-settings
+router.post('/update-settings', auth(['admin']), async (req, res) => {
     try {
-        const { deadline } = req.body;
-        await Settings.findOneAndUpdate(
+        const { registration_deadline, pairing_date, gift_ready_deadline, event_date } = req.body;
+
+        const settings = await Settings.findOneAndUpdate(
             { key: 'global_config' },
-            { registration_deadline: deadline },
+            {
+                registration_deadline,
+                pairing_date,
+                gift_ready_deadline,
+                event_date
+            },
             { upsert: true, new: true }
         );
-        res.json({ message: 'Deadline updated' });
+        res.json({ message: 'Settings updated successfully', settings });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

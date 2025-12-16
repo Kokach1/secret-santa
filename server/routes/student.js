@@ -23,6 +23,12 @@ router.get('/me', auth(['student', 'admin']), async (req, res) => {
         res.json({
             user,
             deadline: settings?.registration_deadline || null,
+            settings: {
+                registration_deadline: settings?.registration_deadline || null,
+                pairing_date: settings?.pairing_date || null,
+                gift_ready_deadline: settings?.gift_ready_deadline || null,
+                event_date: settings?.event_date || null
+            },
             pairing_done: settings?.pairing_done || false,
             santa_progress: mySanta ? mySanta.progress : null
         });
