@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://secret-santa-cek.vercel.app', 'https://secret-santa-cek.onrender.com'],
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://secret-santa-cek.vercel.app', 'https://www.secret-santa-cek.vercel.app', 'https://secret-santa-cek.onrender.com'],
     credentials: true
 }));
 app.use(express.json());
