@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
+import API_URL from '../config';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 
@@ -24,7 +25,7 @@ export default function VerifyEmailPage() {
             }
 
             try {
-                const res = await fetch(`http://localhost:5000/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`);
+                const res = await fetch(`${API_URL}/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`);
                 const data = await res.json();
 
                 if (res.ok) {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import API_URL from '../config';
 import { Gift, UserPlus, ArrowRight, Send } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -21,7 +22,7 @@ export default function RegisterPage() {
         setError('');
 
         try {
-            const res = await fetch('http://localhost:5000/auth/register', {
+            const res = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

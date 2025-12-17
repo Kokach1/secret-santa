@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import API_URL from '../config';
 import { Lock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,7 +15,7 @@ export default function AdminLoginPage() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:5000/auth/login', {
+            const res = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import API_URL from '../config';
 import { useNavigate } from 'react-router-dom';
 import { Gift, Send } from 'lucide-react';
 
@@ -15,7 +16,7 @@ export default function LoginPage() {
         setMessage('');
 
         try {
-            const res = await fetch('http://localhost:5000/auth/login', {
+            const res = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
