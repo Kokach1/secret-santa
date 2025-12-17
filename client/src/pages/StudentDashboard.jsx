@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import API_URL from '../config';
 import { Gift, Clock, CheckCircle, Bell } from 'lucide-react';
 import ChristmasHeader from '../components/ChristmasHeader';
 import SnowAnimation from '../components/SnowAnimation';
@@ -12,7 +13,7 @@ export default function StudentDashboard() {
 
     const fetchNotifications = async () => {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/student/notifications', {
+        const res = await fetch(`${API_URL}/student/notifications`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -24,7 +25,7 @@ export default function StudentDashboard() {
         try {
             if (!isBackground) setLoading(true);
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:5000/student/me', {
+            const res = await fetch(`${API_URL}/student/me`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -64,7 +65,7 @@ export default function StudentDashboard() {
     const updateProgress = async (stage) => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:5000/student/update-progress', {
+            const res = await fetch(`${API_URL}/student/update-progress`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

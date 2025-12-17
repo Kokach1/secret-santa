@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Users, Shuffle, Bell, Calendar } from 'lucide-react';
+import { Trash2, Shuffle, CheckCircle, Gift, Megaphone, Calendar } from 'lucide-react';
+import API_URL from '../config';
 import ChristmasHeader from '../components/ChristmasHeader';
 
 export default function AdminDashboard() {
@@ -9,7 +10,7 @@ export default function AdminDashboard() {
 
     const fetchStudents = async () => {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/admin/students', {
+        const res = await fetch(`${API_URL}/admin/students`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         // Note: The /admin/students endpoint returns simple list. 
@@ -37,7 +38,7 @@ export default function AdminDashboard() {
         if (!window.confirm('Are you sure you want to remove this student? This cannot be undone.')) return;
 
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5000/admin/student/${id}`, {
+        const res = await fetch(`${API_URL}/admin/student/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -53,7 +54,7 @@ export default function AdminDashboard() {
         if (!window.confirm('Are you sure? This will SHUFFLE and RE-ASSIGN all Santas. Previous pairings will be overwritten.')) return;
 
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/admin/pair-students', {
+        const res = await fetch(`${API_URL}/admin/pair-students`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -95,7 +96,7 @@ export default function AdminDashboard() {
                             // Call API
                             const send = async () => {
                                 const token = localStorage.getItem('token');
-                                await fetch('http://localhost:5000/admin/send-notification', {
+                                await fetch(`${API_URL}/admin/send-notification`, {
                                     method: 'POST',
                                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ title, message })
@@ -121,7 +122,7 @@ export default function AdminDashboard() {
                             const formData = new FormData(e.target);
                             const updates = Object.fromEntries(formData.entries());
                             const token = localStorage.getItem('token');
-                            const res = await fetch('http://localhost:5000/admin/update-settings', {
+                            const res = await fetch(`${API_URL}/admin/update-settings`, {
                                 method: 'POST',
                                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                                 body: JSON.stringify(updates)

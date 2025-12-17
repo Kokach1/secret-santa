@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SnowAnimation from '../components/SnowAnimation';
+import API_URL from '../config';
 import { UserCheck, ArrowRight } from 'lucide-react';
 
 export default function CompleteProfilePage() {
@@ -30,7 +32,7 @@ export default function CompleteProfilePage() {
         const token = localStorage.getItem('token');
 
         try {
-            const res = await fetch('http://localhost:5000/auth/complete-profile', {
+            const res = await fetch(`${API_URL}/auth/complete-profile`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
