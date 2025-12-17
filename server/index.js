@@ -9,14 +9,15 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-origin: (origin, callback) => {
-    const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://secret-santa-cek.onrender.com'];
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-        callback(null, true);
-    } else {
-        callback(new Error('Not allowed by CORS'));
-    }
-},
+app.use(cors({
+    origin: (origin, callback) => {
+        const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'https://secret-santa-cek.onrender.com'];
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 app.use(express.json());

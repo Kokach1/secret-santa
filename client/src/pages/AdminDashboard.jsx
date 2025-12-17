@@ -9,25 +9,28 @@ export default function AdminDashboard() {
     const [stats, setStats] = useState({ total: 0, approved: 0 });
 
     const fetchStudents = async () => {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_URL}/admin/students`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        // Note: The /admin/students endpoint returns simple list. 
-        // We will stick to client-side filtering or use the separate /admin/pairs if needed, 
-        // but for simplicity in this view, let's update GET /students in backend to Populate too.
-        const data = await res.json();
-        if (res.ok && data.students) {
-            setStudents(data.students);
-            setStats({
-                total: data.students.length,
-                approved: data.students.filter(s => s.approved).length
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/admin/students`, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-        } else {
-            console.error("Failed to fetch students or invalid format", data);
-            // Don't set students to null/undefined if it fails, keep previous state or empty
+
+            const data = await res.json();
+            if (res.ok && data.students) {
+                setStudents(data.students);
+                setStats({
+                    total: data.students.length,
+                    approved: data.students.filter(s => s.approved).length
+                });
+            } else {
+                console.error("Failed to fetch students:", data);
+            }
+        } catch (error) {
+            console.error("Dashboard Load Error:", error);
+            alert("Failed to load dashboard data. Please check connection.");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => {
