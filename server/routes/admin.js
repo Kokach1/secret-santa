@@ -8,11 +8,13 @@ const Notification = require('../models/Notification');
 // GET /admin/students
 router.get('/students', auth(['admin']), async (req, res) => {
     try {
+        console.log("[ADMIN] Fetching students list...");
         const students = await User.find({ role: 'student' })
             .select('+password_plain')
             .populate('paired_to', 'name department')
             .sort({ createdAt: -1 });
         const settings = await Settings.findOne({ key: 'global_config' });
+        console.log(`[ADMIN] Sending ${students.length} students.`);
         res.json({ students, settings });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -54,13 +56,20 @@ router.post('/update-settings', auth(['admin']), async (req, res) => {
 // DELETE /admin/student/:id
 router.delete('/student/:id', auth(['admin']), async (req, res) => {
     try {
+        console.log(`[DELETE] Request for ID: ${req.params.id}`);
         const student = await User.findById(req.params.id);
-        if (!student) return res.status(404).json({ message: 'Student not found' });
+        if (!student) {
+            console.log(`[DELETE] Student not found`);
+            return res.status(404).json({ message: 'Student not found' });
+        }
 
+        console.log(`[DELETE] Found student, deleting...`);
         await User.findByIdAndDelete(req.params.id);
+        console.log(`[DELETE] Student deleted. Cleaning pairings...`);
 
         // Remove from pairings safely
-        await User.updateMany({ paired_to: req.params.id }, { paired_to: null });
+        await User.updateMany({ paired_to: req.params.id }, { $set: { paired_to: null } });
+        console.log(`[DELETE] Pairings cleaned. Sending response.`);
 
         res.json({ message: 'Student deleted successfully' });
     } catch (error) {

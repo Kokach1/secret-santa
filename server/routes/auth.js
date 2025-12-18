@@ -73,11 +73,14 @@ router.post('/register', async (req, res) => {
                     `
                 };
 
-                await transporter.sendMail(mailOptions);
-                console.log(`Verification Email sent to ${email} via Gmail`);
-            } catch (emailError) {
-                console.error("Gmail Send Failed:", emailError);
-                console.log("FALLBACK LINK (Use this if email fails):", link);
+                transporter.sendMail(mailOptions)
+                    .then(() => console.log(`Verification Email sent to ${email} via Gmail`))
+                    .catch(emailError => {
+                        console.error("Gmail Send Failed:", emailError);
+                        console.log("FALLBACK LINK (Use this if email fails):", link);
+                    });
+            } catch (setupError) {
+                console.error("Nodemailer Setup Error:", setupError);
             }
             console.log(`[BACKUP LOG] Link: ${link}`);
         } else {
