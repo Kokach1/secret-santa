@@ -5,6 +5,48 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 // POST /auth/register
+router.get('/test-email', async (req, res) => {
+    try {
+        const nodemailer = require('nodemailer');
+        const user = process.env.EMAIL_USER;
+        const pass = process.env.EMAIL_PASS;
+
+        let log = [];
+        log.push(`User: ${user ? user : 'MISSING'}`);
+        log.push(`Pass: ${pass ? 'Is Set (' + pass.length + ' chars)' : 'MISSING'}`);
+
+        if (!user || !pass) {
+            return res.json({ success: false, log, message: 'Missing Env Vars' });
+        }
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: { user, pass }
+        });
+
+        try {
+            await transporter.verify();
+            log.push("SMTP Verify Success ✅");
+        } catch (vErr) {
+            log.push("SMTP Verify Failed ❌: " + vErr.message);
+            return res.json({ success: false, log, error: vErr.message });
+        }
+
+        const info = await transporter.sendMail({
+            from: user,
+            to: user, // Send to self
+            subject: 'Test Email from Debugger',
+            text: 'If you see this, email working!'
+        });
+
+        log.push("Email Sent! Message ID: " + info.messageId);
+        res.json({ success: true, log });
+
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message, stack: error.stack });
+    }
+});
+
 router.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
