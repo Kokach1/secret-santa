@@ -1,0 +1,4 @@
+
+PrivateRoute.propTypes = {
+  role: PropTypes.string,
+};

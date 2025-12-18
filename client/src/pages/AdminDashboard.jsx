@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Shuffle, CheckCircle, Gift, Megaphone, Calendar } from 'lucide-react';
+import { Shuffle, Calendar, Bell, Users } from 'lucide-react';
 import API_URL from '../config';
 import ChristmasHeader from '../components/ChristmasHeader';
 
 export default function AdminDashboard() {
     const [students, setStudents] = useState([]);
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true); // Unused for now as we don't show loading state
     const [stats, setStats] = useState({ total: 0, approved: 0 });
 
     const fetchStudents = async () => {
@@ -29,7 +29,7 @@ export default function AdminDashboard() {
             console.error("Dashboard Load Error:", error);
             alert("Failed to load dashboard data. Please check connection.");
         } finally {
-            setLoading(false);
+            // setLoading(false);
         }
     };
 

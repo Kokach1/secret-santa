@@ -1,5 +1,6 @@
 import { Gift, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 export default function ChristmasHeader({ user }) {
     const navigate = useNavigate();
@@ -34,3 +35,10 @@ export default function ChristmasHeader({ user }) {
         </header>
     );
 }
+
+ChristmasHeader.propTypes = {
+    user: PropTypes.shape({
+        name: PropTypes.string,
+        role: PropTypes.string
+    })
+};

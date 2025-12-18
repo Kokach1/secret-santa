@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import VerifyPage from './pages/VerifyPage'; // Keeping for legacy/verify links if any
@@ -50,5 +51,9 @@ function App() {
     </Router>
   );
 }
+
+PrivateRoute.propTypes = {
+  role: PropTypes.string,
+};
 
 export default App;

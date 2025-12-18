@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SnowAnimation from '../components/SnowAnimation';
 import API_URL from '../config';
 import { UserCheck, ArrowRight } from 'lucide-react';
 

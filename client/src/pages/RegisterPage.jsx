@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import API_URL from '../config';
-import { Gift, UserPlus, ArrowRight, Send } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { UserPlus, ArrowRight, Send } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function RegisterPage() {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -64,7 +64,7 @@ export default function RegisterPage() {
                         </div>
                         <h2 className="text-xl font-bold text-green-800">Verification Link Sent!</h2>
                         <p className="text-gray-600">
-                            We've sent a confirmation link to <span className="font-bold text-gray-800">{formData.email}</span>.
+                            We&apos;ve sent a confirmation link to <span className="font-bold text-gray-800">{formData.email}</span>.
                         </p>
                         <div className="text-sm bg-yellow-50 p-3 rounded border border-yellow-200 text-yellow-800">
                             Please check your inbox (and spam folder) to verify your email and complete your profile.

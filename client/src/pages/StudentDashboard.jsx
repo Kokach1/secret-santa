@@ -31,7 +31,7 @@ export default function StudentDashboard() {
             const data = await res.json();
             if (res.ok) {
                 // Combine user and santa_progress
-                setUser(prev => ({ ...data.user, santa_progress: data.santa_progress, settings: data.settings }));
+                setUser(() => ({ ...data.user, santa_progress: data.santa_progress, settings: data.settings }));
                 // Calculate Countdown
                 if (data.settings?.event_date) {
                     const diff = new Date(data.settings.event_date) - new Date();
@@ -162,7 +162,7 @@ export default function StudentDashboard() {
                                 </button>
                             ) : (
                                 <div className="animate-fade-in space-y-2">
-                                    <div className="text-xl text-gray-500 font-medium">Ho Ho Ho! It's</div>
+                                    <div className="text-xl text-gray-500 font-medium">Ho Ho Ho! It&apos;s</div>
                                     <h3 className="text-4xl font-bold text-christmas-red">{user.paired_to.name}</h3>
                                     <div className="inline-block bg-gray-100 rounded-lg px-4 py-2 mt-4 text-left space-y-1">
                                         <p>📚 Dept/Sem: <b>{user.paired_to.department} - {user.paired_to.semester}</b></p>
@@ -183,7 +183,7 @@ export default function StudentDashboard() {
                                 <Clock className="text-christmas-red" /> Your Gift Status
                             </h3>
                             <div className="space-y-4">
-                                {['gift_ready', 'gift_delivered'].map((stage, idx) => {
+                                {['gift_ready', 'gift_delivered'].map((stage) => {
                                     const labels = {
                                         gift_ready: 'Gift Purchased 🛍️',
                                         gift_delivered: 'Gift Delivered 🚚',
@@ -253,7 +253,7 @@ export default function StudentDashboard() {
                                 </div>
                             ) : (
                                 <div className="text-center text-gray-400 py-10">
-                                    <p>Your Santa hasn't started yet.</p>
+                                    <p>Your Santa hasn&apos;t started yet.</p>
                                 </div>
                             )}
                         </div>
