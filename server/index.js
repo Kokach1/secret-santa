@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose'); // Removed for Firebase
 const cors = require('cors');
 const dotenv = require('dotenv');
 
@@ -23,54 +23,46 @@ app.use(cors({
 app.use(express.json());
 
 // Database Connection
+// Database Connection (Firebase initialized internally in models)
 const User = require('./models/User'); // Ensure path is correct
 const bcrypt = require('bcryptjs');
 
-// Database Connection
-mongoose.connect(process.env.MONGODB_URI)
-    .then(async () => {
-        console.log('✅ MongoDB Connected');
+// Routes
+const authRoutes = require('./routes/auth');
+const studentRoutes = require('./routes/student');
+const adminRoutes = require('./routes/admin');
 
-        // AUTO-SEED ADMIN
-        try {
-            const adminEmail = 'kokachi';
-            const existingAdmin = await User.findOne({ email: adminEmail });
-            if (!existingAdmin || !existingAdmin.password) {
-                console.log('⚡ Seeding Admin User...');
-                const hashedPassword = await bcrypt.hash('kokachi@admin', 10);
-                await User.findOneAndUpdate(
-                    { email: adminEmail },
-                    {
-                        name: 'Super Admin',
-                        role: 'admin',
-                        approved: true,
-                        password: hashedPassword
-                    },
-                    { upsert: true }
-                );
-                console.log('✅ Admin "kokachi" seeded via Server.');
-            }
-        } catch (err) {
-            console.error('❌ Seeding Error:', err);
+app.use('/auth', authRoutes);
+app.use('/student', studentRoutes);
+app.use('/admin', adminRoutes);
+
+app.get('/', (req, res) => {
+    res.send('🎄 Secret Santa API is running! 🎅 (Firebase Edition)');
+});
+
+// Auto-Seed Admin on Start
+async function seedAdmin() {
+    try {
+        const adminEmail = 'kokachi';
+        const existingAdmin = await User.findOne({ email: adminEmail });
+        if (!existingAdmin) {
+            console.log('⚡ Seeding Admin User...');
+            const hashedPassword = await bcrypt.hash('kokachi@admin', 10);
+            await User.create({
+                email: adminEmail,
+                name: 'Super Admin',
+                role: 'admin',
+                approved: true,
+                password: hashedPassword
+            });
+            console.log('✅ Admin "kokachi" seeded via Server.');
         }
+    } catch (err) {
+        console.error('❌ Seeding Error:', err);
+    }
+}
+seedAdmin();
 
-
-        // Routes
-        const authRoutes = require('./routes/auth');
-        const studentRoutes = require('./routes/student');
-        const adminRoutes = require('./routes/admin'); // Fix: Ensure this exists!
-
-        app.use('/auth', authRoutes);
-        app.use('/student', studentRoutes);
-        app.use('/admin', adminRoutes);
-
-        app.get('/', (req, res) => {
-            res.send('🎄 Secret Santa API is running! 🎅');
-        });
-
-        // Start Server ONLY after DB is ready
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-        });
-    })
-    .catch(err => console.error('❌ MongoDB Connection Error:', err));
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});

@@ -1,23 +1,46 @@
-const mongoose = require('mongoose');
 
-const MagicTokenSchema = new mongoose.Schema({
-    email: { // Storing email directly to verify strictly, or userId if user exists
-        type: String,
-        required: true,
-        trim: true,
-        lowercase: true
-    },
-    tokenHashed: {
-        type: String,
-        required: true
-    },
-    expiresAt: {
-        type: Date,
-        required: true
+const { db } = require('../config/firebase');
+
+class MagicToken {
+    static collection = db.collection('magic_tokens');
+
+    static async create(data) {
+        await this.collection.add({
+            ...data,
+            createdAt: new Date()
+        });
     }
-}, { timestamps: true });
 
-// Auto expire documents
-MagicTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    static findOne(query) {
+        let ref = this.collection;
+        for (const [key, value] of Object.entries(query)) {
+            ref = ref.where(key, '==', value);
+        }
 
-module.exports = mongoose.model('MagicToken', MagicTokenSchema);
+        return {
+            sort: (sortObj) => {
+                const [field, dir] = Object.entries(sortObj)[0];
+                ref = ref.orderBy(field, dir === -1 ? 'desc' : 'asc');
+                return {
+                    then: (resolve, reject) => {
+                        ref.limit(1).get().then(snapshot => { // findOne implies limit 1
+                            if (snapshot.empty) resolve(null);
+                            else resolve({ _id: snapshot.docs[0].id, ...snapshot.docs[0].data() });
+                        }).catch(reject);
+                    }
+                };
+            }
+        }
+    }
+
+    static async deleteMany(query) {
+        const snapshot = await this.collection.where('email', '==', query.email).get();
+        const batch = db.batch();
+        snapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+    }
+}
+
+module.exports = MagicToken;

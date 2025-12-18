@@ -9,14 +9,26 @@ const Notification = require('../models/Notification');
 router.get('/students', auth(['admin']), async (req, res) => {
     try {
         console.log("[ADMIN] Fetching students list...");
-        const students = await User.find({ role: 'student' })
-            .select('+password_plain')
-            .populate('paired_to', 'name department')
-            .sort({ createdAt: -1 });
+        const studentsRaw = await User.find({ role: 'student' }).sort({ createdAt: -1 });
+
+        // Manual Populate 'paired_to'
+        const students = await Promise.all(studentsRaw.map(async (s) => {
+            if (s.paired_to) {
+                try {
+                    const partner = await User.findById(s.paired_to);
+                    if (partner) {
+                        s.paired_to = { name: partner.name, department: partner.department };
+                    }
+                } catch (e) { console.warn("Failed to populate partner", e); }
+            }
+            return s;
+        }));
+
         const settings = await Settings.findOne({ key: 'global_config' });
         console.log(`[ADMIN] Sending ${students.length} students.`);
         res.json({ students, settings });
     } catch (error) {
+        console.error("ADMIN LIST ERROR:", error);
         res.status(500).json({ message: 'Server error' });
     }
 });
